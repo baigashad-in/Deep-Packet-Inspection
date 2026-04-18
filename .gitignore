@@ -1,0 +1,32 @@
+# ----- Build Output -----
+bin/
+obj/
+
+# ----- User-Specific Files -----
+*.user
+*.suo
+.vs/
+
+# ----- OS Generated Files -----
+.DS_Store
+Thumbs.db
+
+# ----- Nuget Packages -----
+packages/
+
+# ----- Debug Files -----
+*.pdb
+*.exe
+*.dll
+
+# ----- Test Results -----
+TestResults/
+
+# ----- Logs -----
+*.log
+
+# ----- PCAP files (test data - large binary files) -----
+*.pcap
+
+# ----- Crash Dumps -----
+*.dmp
