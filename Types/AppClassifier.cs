@@ -23,7 +23,7 @@ namespace Deep_Packet_Analyzer.Types
                 AppType.Google => "Google",
                 AppType.Facebook => "Facebook",
                 AppType.YouTube => "YouTube",
-                AppType.Twitter => "Twitte/X",
+                AppType.Twitter => "Twitter/X",
                 AppType.Instagram => "Instagram",
                 AppType.Netflix => "Netflix",
                 AppType.Amazon => "Amazon",
