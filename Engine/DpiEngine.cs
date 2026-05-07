@@ -37,7 +37,7 @@ namespace Deep_Packet_Analyzer.Engine
             int totalFps = config.NumLoadBalancers * config.FpsPerLb;
 
             Console.WriteLine("╔════════════════════════════════════════╗");
-            Console.WriteLine("║           DPI ENGINE v1.0 (C#)        ║");
+            Console.WriteLine("║           DPI ENGINE v1.0 (C#)         ║");
             Console.WriteLine("╠════════════════════════════════════════╣");
             Console.WriteLine($"║ Load Balancers:    {config.NumLoadBalancers,3}                 ║");
             Console.WriteLine($"║ FPs per LB:        {config.FpsPerLb,3}                 ║");
@@ -221,21 +221,21 @@ namespace Deep_Packet_Analyzer.Engine
             sb.AppendLine("\n╔════════════════════════════════════════╗");
             sb.AppendLine("║         DPI ENGINE STATISTICS          ║");
             sb.AppendLine("╠════════════════════════════════════════╣");
-            sb.AppendLine($"║ Total Packets:   {_stats.TotalPackets,12}       ║");
-            sb.AppendLine($"║ Total Bytes:     {_stats.TotalBytes,12}       ║");
-            sb.AppendLine($"║ TCP Packets:     {_stats.TcpPackets,12}       ║");
-            sb.AppendLine($"║ UDP Packets:     {_stats.UdpPackets,12}       ║");
-            sb.AppendLine($"║ Forwarded:       {_stats.ForwardedPackets,12}       ║");
-            sb.AppendLine($"║ Dropped:         {_stats.DroppedPackets,12}       ║");
+            sb.AppendLine($"║ Total Packets:   {_stats.TotalPackets,12}          ║");
+            sb.AppendLine($"║ Total Bytes:     {_stats.TotalBytes,12}          ║");
+            sb.AppendLine($"║ TCP Packets:     {_stats.TcpPackets,12}          ║");
+            sb.AppendLine($"║ UDP Packets:     {_stats.UdpPackets,12}          ║");
+            sb.AppendLine($"║ Forwarded:       {_stats.ForwardedPackets,12}          ║");
+            sb.AppendLine($"║ Dropped:         {_stats.DroppedPackets,12}          ║");
 
             long totalFpProcessed = _fps.Sum(fp => fp.PacketsProcessed);
             long totalFpForwarded = _fps.Sum(fp => fp.PacketsForwarded);
             long totalFpDropped = _fps.Sum(fp => fp.PacketsDropped);
 
             sb.AppendLine("╠════════════════════════════════════════╣");
-            sb.AppendLine($"║ FP Processed:    {totalFpProcessed,12}       ║");
-            sb.AppendLine($"║ FP Forwarded:    {totalFpForwarded,12}       ║");
-            sb.AppendLine($"║ FP Dropped:      {totalFpDropped,12}       ║");
+            sb.AppendLine($"║ FP Processed:    {totalFpProcessed,12}          ║");
+            sb.AppendLine($"║ FP Forwarded:    {totalFpForwarded,12}          ║");
+            sb.AppendLine($"║ FP Dropped:      {totalFpDropped,12}          ║");
             sb.AppendLine("╚════════════════════════════════════════╝");
 
             return sb.ToString();

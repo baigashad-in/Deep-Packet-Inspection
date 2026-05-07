@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Deep_Packet_Analyzer": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\asus\\Documents\\Job\\Projects\\http.cap\" output.pcap"
+    }
+  }
+}
