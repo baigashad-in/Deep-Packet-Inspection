@@ -21,6 +21,18 @@ if (args.Length < 2)
 string inputFile = args[0];
 string outputFile = args[1];
 
+if (!File.Exists(inputFile))
+{
+    Console.WriteLine($"Input file not found: {inputFile}");
+    return 1;
+}
+
+if (Path.GetFullPath(inputFile) == Path.GetFullPath(outputFile))
+{
+    Console.WriteLine("Input and output files must differ");
+    return 1;
+}
+
 var config = new DpiEngineConfig
 {
     NumLoadBalancers = 2,
@@ -62,7 +74,15 @@ for (int i = 2; i < args.Length; i++)
     }
 }
 
-engine.ProcessFile(inputFile, outputFile);
+try
+{
+    engine.ProcessFile(inputFile, outputFile);
+}
+catch(Exception ex)
+{
+    Console.Error.WriteLine($"Error: {ex.Message}");
+    return 1;
+}
 
 Console.WriteLine($"\nOutput written to: {outputFile}");
 return 0;

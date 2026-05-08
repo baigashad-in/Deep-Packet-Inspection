@@ -177,7 +177,7 @@ namespace Deep_Packet_Analyzer.Engine
                 if (parsed.HasTcp) _stats.IncrementTcp();
                 else if (parsed.HasUdp) _stats.IncrementUdp();
 
-                int lbIndex = Math.Abs(job.TupleObj.GetHashCode()) % _lbs.Length;
+                int lbIndex = (job.TupleObj.GetHashCode() & 0x7FFFFFFF) % _lbs.Length;
                 _lbs[lbIndex].InputQueue.Push(job);
             }
 
