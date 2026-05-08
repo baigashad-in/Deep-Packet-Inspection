@@ -94,6 +94,13 @@ namespace Deep_Packet_Analyzer.Engine
             _outputThread.Start();
 
             foreach (var fp in _fps) fp.Start();
+            foreach (var lb in _lbs) lb.Start();
+
+            ReadPackets(inputFile);
+
+            Thread.Sleep(500);
+
+            foreach (var lb in _lbs) lb.Stop();
             foreach (var fp in _fps) fp.Stop();
 
             _running = false;
@@ -235,7 +242,7 @@ namespace Deep_Packet_Analyzer.Engine
             sb.AppendLine("╠════════════════════════════════════════╣");
             sb.AppendLine($"║ FP Processed:    {totalFpProcessed,12}          ║");
             sb.AppendLine($"║ FP Forwarded:    {totalFpForwarded,12}          ║");
-            sb.AppendLine($"║ FP Dropped:      {totalFpDropped,12}          ║");
+            sb.AppendLine($"║ FP Dropped:      {totalFpDropped,12}         ║");
             sb.AppendLine("╚════════════════════════════════════════╝");
 
             return sb.ToString();
