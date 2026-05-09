@@ -67,7 +67,7 @@ namespace Deep_Packet_Analyzer.Processing
 
         private int SelectFp(FiveTuple tuple)
         {
-            return (tuple.GetHashCode() & 0x7FFFFFFF) % _fpQueues.Length;
+            return (tuple.Normalize().GetHashCode() & 0x7FFFFFFF) % _fpQueues.Length;
         }
 
         public long PacketsReceived => Interlocked.Read(ref _packetsReceived);

@@ -43,6 +43,26 @@ namespace Deep_Packet_Analyzer.Types
             };
         }
 
+        public FiveTuple Normalize()
+        {
+            bool shouldSwap = SrcIp > DstIp || (SrcIp == DstIp && SrcPort > DstPort);
+
+            if (shouldSwap)
+            {
+                return new FiveTuple
+                {
+                    SrcIp = DstPort,
+                    DstIp = SrcPort,
+                    SrcPort = DstPort,
+                    DstPort = SrcPort,
+                    Protocol = Protocol,
+                };
+            }
+
+            return this;
+        }
+
+
         public override string ToString()
         {
             return $"{IpToString(SrcIp)}:{SrcPort} -> {IpToString(DstIp)}:{DstPort}" + $"({(Protocol == 6 ? "TCP" : Protocol == 17 ? "UDP" : "?")})";
