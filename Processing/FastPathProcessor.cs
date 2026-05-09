@@ -75,14 +75,24 @@ namespace Deep_Packet_Analyzer.Processing
 
                 Interlocked.Increment(ref _packetsProcessed);
 
-                PacketAction action = ProcessPacket(job);
+                try
+                {
+                    PacketAction action = ProcessPacket(job);
 
-                _outputCallback(job, action);
+                    _outputCallback(job, action);
 
-                if (action == PacketAction.Drop)
-                    Interlocked.Increment(ref _packetsDropped);
-                else
+                    if (action == PacketAction.Drop)
+                        Interlocked.Increment(ref _packetsDropped);
+                    else
+                        Interlocked.Increment(ref _packetsForwarded);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"[FP{_fpId}] Error processing packet #{job.PacketId}: {ex.Message}");
                     Interlocked.Increment(ref _packetsForwarded);
+                    _outputCallback(job, PacketAction.Forward);
+                }
+                
             }
         }
 
