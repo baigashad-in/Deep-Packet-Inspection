@@ -89,5 +89,24 @@ namespace Deep_Packet_Analyzer.Types
             // If SNI is present but doesn't match any known pattern,
             // we at least know it's HTTPS traffic (it had a TLS Client Hello).
         }
-    }
+
+        public static bool IsMoreSpecific(AppType newType, AppType currentType)
+        {
+            if (IsAppSpecific(currentType)) return false;
+            return IsAppSpecific(newType);
+        }
+
+        private static bool IsAppSpecific(AppType type)
+        {
+            return type switch
+            {
+                AppType.Unknown => false,
+                AppType.HTTP => false,
+                AppType.HTTPS => false,
+                AppType.DNS => false,
+                AppType.TLS => false,
+                AppType.QUIC => false,
+                _ => true
+            };
+        }
 }

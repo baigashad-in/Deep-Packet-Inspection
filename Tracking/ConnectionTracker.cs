@@ -66,6 +66,14 @@ namespace Deep_Packet_Analyzer.Tracking
                 conn.StateObj = ConnectionState.Classified;
                 _classifiedCount++;
             }
+            else if (AppClassifier.IsMoreSpecific(app, conn.AppTypeObj))
+            {
+                conn.AppTypeObj = app;
+                if (!string.IsNullOrEmpty(sni))
+                    conn.SniObj = sni;
+            }
+
+
         }
 
         public void BlockConnection(Connection conn)

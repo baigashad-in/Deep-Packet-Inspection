@@ -108,7 +108,9 @@ namespace Deep_Packet_Analyzer.Processing
             if (conn.StateObj == ConnectionState.Blocked)
                 return PacketAction.Drop;
 
-            if (conn.StateObj != ConnectionState.Classified && job.PayloadLength > 0)
+            if (job.PayloadLength > 0 &&
+                (conn.StateObj != ConnectionState.Classified ||
+                 !AppClassifier.IsAppSpecific(conn.AppTypeObj)))
                 InspectPayload(job, conn);
 
             return CheckRules(job, conn);
