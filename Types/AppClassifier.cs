@@ -45,12 +45,12 @@ namespace Deep_Packet_Analyzer.Types
         // Classify an SNI hostname into an app category.
         // Called every time we extract an SNI from a TLS Client Hello.
         {
-            if (string.IsNullOrEmpty(sni)) return AppType.Unknown; 
+            if (string.IsNullOrEmpty(sni)) return AppType.Unknown;
             // Guard clause — empty string means no SNI was found.
-            string lower = sni.ToLowerInvariant(); 
+            string lower = sni.ToLowerInvariant();
             // Normalize to lowercase. DNS names are case-insensitive per RFC 4343.
             if (lower.Contains("youtube") || lower.Contains("ytimg") || lower.Contains("youtu.be"))
-                return AppType.YouTube;  
+                return AppType.YouTube;
             // Contains() does a substring search.
             if (lower.Contains("google") || lower.Contains("gstatic") || lower.Contains("googleapis"))
                 return AppType.Google;
@@ -85,7 +85,7 @@ namespace Deep_Packet_Analyzer.Types
             if (lower.Contains("cloudflare"))
                 return AppType.Cloudflare;
 
-            return AppType.HTTPS; 
+            return AppType.HTTPS;
             // If SNI is present but doesn't match any known pattern,
             // we at least know it's HTTPS traffic (it had a TLS Client Hello).
         }
@@ -96,7 +96,7 @@ namespace Deep_Packet_Analyzer.Types
             return IsAppSpecific(newType);
         }
 
-        private static bool IsAppSpecific(AppType type)
+        public static bool IsAppSpecific(AppType type)
         {
             return type switch
             {
@@ -109,4 +109,5 @@ namespace Deep_Packet_Analyzer.Types
                 _ => true
             };
         }
+    }
 }
