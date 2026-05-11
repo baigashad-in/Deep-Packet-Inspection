@@ -98,7 +98,17 @@ namespace Deep_Packet_Analyzer.Engine
 
             ReadPackets(inputFile);
 
-            Thread.Sleep(500);
+            // Wait for all queues to drain
+            bool drained = false;
+            while (!drained)
+            {
+                Thread.Sleep(100);
+                int lbTotal = _lbs.Sum(lb => lb.InputQueue.Count);
+                int fpTotal = _fps.Sum(fp => fp.InputQueue.Count);
+                int outTotal = _outputQueue?.Count ?? 0;
+                drained = lbTotal == 0 && fpTotal == 0 && outTotal == 0;
+            }
+            Thread.Sleep(100);
 
             foreach (var lb in _lbs) lb.Stop();
             foreach (var fp in _fps) fp.Stop();
