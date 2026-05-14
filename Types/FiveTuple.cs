@@ -52,7 +52,7 @@ namespace Deep_Packet_Analyzer.Types
                 return new FiveTuple
                 {
                     SrcIp = DstPort,
-                    DstIp = SrcPort,
+                    DstIp = SrcIp,
                     SrcPort = DstPort,
                     DstPort = SrcPort,
                     Protocol = Protocol,
