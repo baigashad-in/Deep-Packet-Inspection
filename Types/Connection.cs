@@ -8,7 +8,7 @@ namespace Deep_Packet_Analyzer.Types
 {
     public class Connection
     {
-        public FiveTuple TupleObj { get; set; } = new(); // five-tuple that identifies which connection this object belongs to.
+        public FiveTuple TupleObj { get; init; } = new(); // five-tuple that identifies which connection this object belongs to.
 
         public ConnectionState StateObj { get; set; } = ConnectionState.New; // Where this connection is in its lifecycle.
 

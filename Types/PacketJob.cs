@@ -9,8 +9,8 @@ namespace Deep_Packet_Analyzer.Types
     public class PacketJob
     {
         public uint PacketId {  get; set; } // A sequential counter assigned by the reader thread. First packet = 0, second = 1, etc.
-        public FiveTuple TupleObj { get; set; } = new(); // five-tuple extracted from this packet's IP and transport headers.
-        public byte[] Data { get; set; } = []; // The complete raw packet bytes — the entire Ethernet frame as it appeared in the PCAP file.
+        public FiveTuple TupleObj { get; init; } = new(); // five-tuple extracted from this packet's IP and transport headers.
+        public byte[] Data { get; init; } = []; // The complete raw packet bytes — the entire Ethernet frame as it appeared in the PCAP file.
         public int EthOffset { get; set; } //  byte offset where the Ethernet header starts in the Data array.
         public int IpOffset { get; set; } // byte offset where the IP header starts.
         public int TransportOffset { get; set; } // byte offset where the TCP or UDP header starts.
