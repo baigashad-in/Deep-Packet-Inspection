@@ -1,5 +1,6 @@
 ﻿using Deep_Packet_Analyzer.Types;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Net;
 
 namespace Deep_Packet_Analyzer.Rules
 {
@@ -22,6 +23,11 @@ namespace Deep_Packet_Analyzer.Rules
 
         public void BlockIp(string ip)
         {
+            if (!IPAddress.TryParse(ip, out _))
+            {
+                Console.Error.WriteLine($"[RuleManager] Invalid IP, not blocking: {ip}");
+                return;
+            }
             uint parsed = ParseIp(ip);
             _ipLock.EnterWriteLock();
             try { _blockedIps.Add(parsed); }
@@ -31,6 +37,11 @@ namespace Deep_Packet_Analyzer.Rules
 
         public void UnblockIp(string ip)
         {
+            if (!IPAddress.TryParse(ip, out _))
+            {
+                Console.Error.WriteLine($"[RuleManager] Invalid IP, cannot unblock: {ip}");
+                return;
+            }
             uint parsed = ParseIp(ip);
             _ipLock.EnterWriteLock();
             try { _blockedIps.Remove(parsed); }
@@ -136,22 +147,14 @@ namespace Deep_Packet_Analyzer.Rules
 
         public static uint ParseIp(string ip)
         {
-            uint result = 0;
-            int octet = 0, shift = 0;
-            foreach (char c in ip)
+            if (!IPAddress.TryParse(ip, out var addr))
             {
-                if (c == '.')
-                {
-                    result |= (uint)(octet << shift);
-                    shift += 8;
-                    octet = 0;
-                }
-
-                else if (c >= '0' && c <= '9')
-                    octet = octet * 10 + (c - '0');
+                Console.Error.WriteLine($"[RuleManager] Invalid IP address: {ip}");
+                return 0;
             }
-            result |= (uint)(octet << shift);
-            return result;
+
+            byte[] bytes = addr.GetAddressBytes();
+            return (uint)(bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24));
         }
     }
 }
