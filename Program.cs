@@ -42,38 +42,65 @@ var config = new DpiEngineConfig
 var engine = new DpiEngine(config);
 engine.Initialize();
 
-for (int i = 2; i < args.Length; i++)
+try
 {
-    switch (args[i])
+    for (int i = 2; i < args.Length; i++)
     {
-        case "--block-ip" when i + 1 < args.Length:
-            engine.Rules.BlockIp(args[++i]);
-            break;
+        switch (args[i])
+        {
+            case "--block-ip" when i + 1 < args.Length:
+                engine.Rules.BlockIp(args[++i]);
+                break;
 
-        case "--block-app" when i + 1 < args.Length:
-            string appName = args[++i];
-            foreach (AppType app in Enum.GetValues<AppType>())
-            {
-                if (AppClassifier.AppTypeToString(app)
-                    .Equals(appName, StringComparison.OrdinalIgnoreCase))
+            case "--block-app" when i + 1 < args.Length:
+                string appName = args[++i];
+                bool found = false;
+                foreach (AppType app in Enum.GetValues<AppType>())
                 {
-                    engine.Rules.BlockApp(app);
-                    break;
+                    if (AppClassifier.AppTypeToString(app)
+                        .Equals(appName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        engine.Rules.BlockApp(app);
+                        found = true;
+                        break;
+                    }
                 }
-            }
-            break;
+                if (!found)
+                {
+                    Console.Error.WriteLine($"Unknown app: '{appName}'");
+                    Console.Error.WriteLine("Available apps: " + string.Join(", ",
+                        Enum.GetValues<AppType>()
+                            .Where(a => a != AppType.Unknown)
+                            .Select(a => AppClassifier.AppTypeToString(a))));
+                }
+                break;
 
-        case "--block-domain" when i + 1 < args.Length:
-            engine.Rules.BlockDomain(args[++i]);
-            break;
+            case "--block-domain" when i + 1 < args.Length:
+                engine.Rules.BlockDomain(args[++i]);
+                break;
 
-        case "--block-port" when i + 1 < args.Length:
-            if (ushort.TryParse(args[++i], out ushort port))
-                engine.Rules.BlockPort(port);
-            break;
+            case "--block-port" when i + 1 < args.Length:
+                string portStr = args[++i];
+                if (!ushort.TryParse(portStr, out ushort port))
+                    Console.Error.WriteLine($"Invalid port number: '{portStr}'");
+                else
+                    engine.Rules.BlockPort(port);
+                break;
+
+            default:
+                if (args[i].StartsWith("--"))
+                    Console.Error.WriteLine($"Unknown option: '{args[i]}'");
+                break;
+
+        }
     }
 }
 
+catch (Exception ex)
+{
+    Console.Error.WriteLine($"Error parsing arguments: {ex.Message}");
+    return 1;
+}
 try
 {
     engine.ProcessFile(inputFile, outputFile);
