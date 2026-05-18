@@ -168,19 +168,9 @@ namespace Deep_Packet_Analyzer.Engine
                     int ipIhl = raw.Data[14] & 0x0F;
                     job.TransportOffset = 14 + ipIhl * 4;
 
-                    if (parsed.HasTcp && raw.Data.Length > job.TransportOffset + 12)
-                    {
-                        int tcpOff = (raw.Data[job.TransportOffset + 12] >> 4) & 0x0F;
-                        job.PayloadOffset = job.TransportOffset + tcpOff * 4;
-                    }
-                    else if (parsed.HasUdp)
-                    {
-                        job.PayloadOffset = job.TransportOffset + 8;
-                    }
-
-                    if (job.PayloadOffset < raw.Data.Length)
-                        job.PayloadLength = raw.Data.Length - job.PayloadOffset;
                 }
+                job.PayloadOffset = parsed.PayloadOffset;
+                job.PayloadLength = parsed.PayloadLength;
 
                 _stats.IncrementTotalPackets();
                 _stats.AddTotalBytes(raw.Data.Length);
