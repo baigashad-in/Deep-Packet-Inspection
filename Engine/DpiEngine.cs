@@ -29,7 +29,6 @@ namespace Deep_Packet_Analyzer.Engine
         private Thread? _outputThread;
 
         private BinaryWriter? _outputWriter;
-        private readonly object _outputLock = new();
 
         public DpiEngine(DpiEngineConfig config)
         {
@@ -196,8 +195,6 @@ namespace Deep_Packet_Analyzer.Engine
 
         private void WriteOutputHeader(PcapGlobalHeader h)
         {
-            lock (_outputLock)
-            {
                 if (_outputWriter is null) return;
                 _outputWriter.Write(h.MagicNumber);
                 _outputWriter.Write(h.VersionMajor);
@@ -206,20 +203,16 @@ namespace Deep_Packet_Analyzer.Engine
                 _outputWriter.Write(h.SigFigs);
                 _outputWriter.Write(h.SnapLen);
                 _outputWriter.Write(h.Network);
-            }
         }
 
         private void WriteOutputPacket(PacketJob job)
         {
-            lock (_outputLock)
-            {
                 if (_outputWriter is null) return;
                 _outputWriter.Write(job.TsSec);
                 _outputWriter.Write(job.TsUsec);
                 _outputWriter.Write((uint)job.Data.Length);
                 _outputWriter.Write((uint)job.Data.Length);
                 _outputWriter.Write(job.Data);
-            }
         }
 
         public string GenerateReport()
