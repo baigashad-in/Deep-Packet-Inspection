@@ -45,6 +45,7 @@ namespace Deep_Packet_Analyzer.Engine
         }
 
         public RuleManager Rules => _ruleManager;
+        public DpiStats Stats => _stats;
 
         public bool Initialize()
         {

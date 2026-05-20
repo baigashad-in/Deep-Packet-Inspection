@@ -1,7 +1,7 @@
 ﻿using Deep_Packet_Analyzer.Engine;
 using Deep_Packet_Analyzer.Types;
 
-if (args.Length < 2)
+if (args.Length < 2 || args.Any(a => a == "--help" || a == "-h" || a == "/?"))
 {
     Console.WriteLine("Usage: PacketAnalyzer <input.pcap> <output.pcap> [options]");
     Console.WriteLine();
@@ -9,7 +9,7 @@ if (args.Length < 2)
     Console.WriteLine(" --block-ip <ip> Block traffic from source IP");
     Console.WriteLine(" --block-app <app> Block application (YouTube, Facebook, etc.)");
     Console.WriteLine(" --block-domain <dom> Block domain (*.tiktok.com)");
-    Console.WriteLine(" --block-port <port> Block destinatin port");
+    Console.WriteLine(" --block-port <port> Block destination port");
     Console.WriteLine();
     Console.WriteLine("Examples:");
     Console.WriteLine(" DeepPacketAnalyzer capture.pcap filtered.pcap");
@@ -101,6 +101,9 @@ catch (Exception ex)
     Console.Error.WriteLine($"Error parsing arguments: {ex.Message}");
     return 1;
 }
+
+var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
 try
 {
     engine.ProcessFile(inputFile, outputFile);
@@ -109,6 +112,19 @@ catch(Exception ex)
 {
     Console.Error.WriteLine($"Error: {ex.Message}");
     return 1;
+}
+
+stopwatch.Stop();
+double seconds = stopwatch.Elapsed.TotalSeconds;
+long packets = engine.Stats.TotalPackets;
+long bytes = engine.Stats.TotalBytes;
+
+Console.WriteLine($"\n═══ Performance ═══");
+Console.WriteLine($"Time:         {seconds:F2} seconds");
+if (seconds > 0)
+{
+    Console.WriteLine($"Packets/sec:  {packets / seconds:F0}");
+    Console.WriteLine($"Throughput:   {(bytes * 8) / seconds / 1_000_000:F2} Mbps");
 }
 
 Console.WriteLine($"\nOutput written to: {outputFile}");
