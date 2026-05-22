@@ -9,6 +9,7 @@ namespace Deep_Packet_Analyzer.Types
     public enum AppType
     {
         Unknown = 0,
+        Other,
         HTTP,
         HTTPS,
         DNS,

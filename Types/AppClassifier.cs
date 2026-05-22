@@ -14,7 +14,7 @@ namespace Deep_Packet_Analyzer.Types
         {
             return type switch
             {
-                AppType.Unknown => "Unknown",
+                AppType.Unknown => "Other",
                 AppType.HTTP => "HTTP",
                 AppType.HTTPS => "HTTPS",
                 AppType.DNS => "DNS",
@@ -85,7 +85,7 @@ namespace Deep_Packet_Analyzer.Types
             if (lower.Contains("cloudflare"))
                 return AppType.Cloudflare;
 
-            return AppType.HTTPS;
+            return AppType.Other;
             // If SNI is present but doesn't match any known pattern,
             // we at least know it's HTTPS traffic (it had a TLS Client Hello).
         }
@@ -101,6 +101,7 @@ namespace Deep_Packet_Analyzer.Types
             return type switch
             {
                 AppType.Unknown => false,
+                AppType.Other => false,
                 AppType.HTTP => false,
                 AppType.HTTPS => false,
                 AppType.DNS => false,
