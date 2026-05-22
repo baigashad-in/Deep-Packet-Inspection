@@ -102,11 +102,20 @@ catch (Exception ex)
     return 1;
 }
 
+var cts = new CancellationTokenSource();
+
+Console.CancelKeyPress += (sender, e) =>
+{
+    Console.WriteLine("\n[Ctrl+C] Shutting down gracefully...");
+    e.Cancel = true;
+    cts.Cancel();
+};
+
 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
 try
 {
-    engine.ProcessFile(inputFile, outputFile);
+    engine.ProcessFile(inputFile, outputFile, cts.Token);
 }
 catch(Exception ex)
 {

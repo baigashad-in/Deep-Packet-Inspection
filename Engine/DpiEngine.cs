@@ -82,7 +82,7 @@ namespace Deep_Packet_Analyzer.Engine
             return true;
         }
 
-        public bool ProcessFile(string inputFile, string outputFile)
+        public bool ProcessFile(string inputFile, string outputFile, CancellationToken cancellationToken = default)
         {
             Console.WriteLine($"\n[DPIEngine] Processing: {inputFile}");
             Console.WriteLine($"[DPIEngine] Output to: {outputFile}\n");
@@ -96,7 +96,7 @@ namespace Deep_Packet_Analyzer.Engine
             foreach (var fp in _fps) fp.Start();
             foreach (var lb in _lbs) lb.Start();
 
-            ReadPackets(inputFile);
+            ReadPackets(inputFile, cancellationToken);
 
             // Wait for all queues to drain
             bool drained = false;
@@ -125,7 +125,7 @@ namespace Deep_Packet_Analyzer.Engine
             return true;
         }
 
-        private void ReadPackets(string inputFile)
+        private void ReadPackets(string inputFile, CancellationToken cancellationToken = default)
         {
             using var reader = new PcapReader();
             if (!reader.Open(inputFile)) return;
@@ -136,6 +136,11 @@ namespace Deep_Packet_Analyzer.Engine
 
             while (reader.ReadNextPacket(out var raw))
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    Console.WriteLine($"[Reader] Cancelled after {packetId} packets");
+                    break;
+                }
                 var parsed = new ParsedPacket
                 {
                     TimestampSec = raw.Header.TsSec,
