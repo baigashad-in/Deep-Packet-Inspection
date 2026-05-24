@@ -1,4 +1,6 @@
-﻿namespace Deep_Packet_Analyzer.Parsing
+﻿using Deep_Packet_Analyzer.Types;
+
+namespace Deep_Packet_Analyzer.Parsing
 {
     public class ParsedPacket
     {
@@ -20,7 +22,7 @@
         public bool HasUdp { get; set; }
         public ushort SrcPort { get; set; }
         public ushort DstPort { get; set; }
-        public byte TcpFlags { get; set; }
+        public TcpFlags TcpFlags { get; set; }
         public uint SeqNumber { get; set; }
         public uint AckNumber { get; set; }
 

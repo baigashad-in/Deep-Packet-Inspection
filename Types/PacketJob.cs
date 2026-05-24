@@ -16,7 +16,7 @@ namespace Deep_Packet_Analyzer.Types
         public int TransportOffset { get; set; } // byte offset where the TCP or UDP header starts.
         public int PayloadOffset { get; set; } // byte offset where the application payload starts - the actual data the app sent.
         public int PayloadLength { get; set; } // How many bytes of application payload are in this packet.
-        public byte TcpFlags { get; set; } // TCP flags byte extracted from the TCP header during parsing.
+        public TcpFlags TcpFlags { get; set; } // TCP flags byte extracted from the TCP header during parsing.
 
 
         //The original capture timestamps from the PCAP file.

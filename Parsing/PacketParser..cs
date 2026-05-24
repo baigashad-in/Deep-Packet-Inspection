@@ -1,4 +1,5 @@
-﻿using System.Buffers.Binary;
+﻿using Deep_Packet_Analyzer.Types;
+using System.Buffers.Binary;
 
 
 namespace Deep_Packet_Analyzer.Parsing
@@ -10,13 +11,6 @@ namespace Deep_Packet_Analyzer.Parsing
         public const byte UDP = 17;
 
         public const ushort EtherTypeIPv4 = 0x0800;
-
-        public const byte FIN = 0x01;
-        public const byte SYN = 0x02;
-        public const byte RST = 0x04;
-        public const byte PSH = 0x08;
-        public const byte ACK = 0x10;
-        public const byte URG = 0x20;
     }
 
     public static class PacketParser
@@ -109,7 +103,7 @@ namespace Deep_Packet_Analyzer.Parsing
             byte dataOffset = (byte)((data[offset + 12] >> 4) & 0x0F);
             int tcpHeaderLen = dataOffset * 4;
 
-            parsed.TcpFlags = data[offset + 13];
+            parsed.TcpFlags = (TcpFlags)data[offset + 13];
 
             if (tcpHeaderLen < MIN_TCP_HEADER_LEN || data.Length < offset + tcpHeaderLen)
                 return false;
@@ -160,15 +154,10 @@ namespace Deep_Packet_Analyzer.Parsing
             };
         }
 
-        public static string TcpFlagsToString(byte flags)
+        public static string TcpFlagsToString(TcpFlags flags)
         {
-            var parts = new List<string>();
-            if ((flags & ProtocolConstants.SYN) != 0) parts.Add("SYN");
-            if ((flags & ProtocolConstants.ACK) != 0) parts.Add("ACK");
-            if ((flags & ProtocolConstants.RST) != 0) parts.Add("RST");
-            if ((flags & ProtocolConstants.PSH) != 0) parts.Add("PSH");
-            if ((flags & ProtocolConstants.URG) != 0) parts.Add("URG");
-            return parts.Count > 0 ? string.Join(" ", parts) : "none";
+            if (flags == TcpFlags.None) return "none";
+            return flags.ToString();
         }
     }
 }

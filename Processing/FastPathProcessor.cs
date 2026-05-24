@@ -187,12 +187,12 @@ namespace Deep_Packet_Analyzer.Processing
             return PacketAction.Forward;
         }
 
-        private void UpdateTcpState(Connection conn, byte flags)
+        private void UpdateTcpState(Connection conn, TcpFlags flags)
         {
-            if ((flags & ProtocolConstants.SYN) != 0)
+            if (flags.HasFlag(TcpFlags.SYN))
             {
 
-                if ((flags & ProtocolConstants.ACK) != 0)
+                if (flags.HasFlag(TcpFlags.ACK))
                     conn.SynAckSeen = true;
                 else
                     conn.SynSeen = true;
@@ -200,15 +200,15 @@ namespace Deep_Packet_Analyzer.Processing
             }
 
 
-            if (conn.SynSeen && conn.SynAckSeen && (flags & ProtocolConstants.ACK) != 0)
+            if (conn.SynSeen && conn.SynAckSeen && flags.HasFlag(TcpFlags.ACK))
             {
                 if (conn.StateObj == ConnectionState.New)
                     conn.StateObj = ConnectionState.Established;
             }
 
-            if ((flags & ProtocolConstants.FIN) != 0) conn.FinSeen = true;
-            if ((flags & ProtocolConstants.RST) != 0) conn.StateObj = ConnectionState.Closed;
-            if (conn.FinSeen && (flags & ProtocolConstants.ACK) != 0)
+            if (flags.HasFlag(TcpFlags.FIN)) conn.FinSeen = true;
+            if (flags.HasFlag(TcpFlags.RST)) conn.StateObj = ConnectionState.Closed;
+            if (conn.FinSeen && flags.HasFlag(TcpFlags.ACK))
                 conn.StateObj = ConnectionState.Closed;
         }
 
