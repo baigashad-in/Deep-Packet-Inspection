@@ -41,48 +41,99 @@ namespace Deep_Packet_Analyzer.Types
 
             };
         }
+
+        private static bool MatchesDomain(string host, string domain)
+        {
+            return host.Equals(domain, StringComparison.OrdinalIgnoreCase) ||
+                   host.EndsWith("." + domain, StringComparison.OrdinalIgnoreCase);
+        }
+
         public static AppType SniToAppType(string sni)
         // Classify an SNI hostname into an app category.
         // Called every time we extract an SNI from a TLS Client Hello.
         {
             if (string.IsNullOrEmpty(sni)) return AppType.Unknown;
-            // Guard clause — empty string means no SNI was found.
-            string lower = sni.ToLowerInvariant();
-            // Normalize to lowercase. DNS names are case-insensitive per RFC 4343.
-            if (lower.Contains("youtube") || lower.Contains("ytimg") || lower.Contains("youtu.be"))
+
+            // YouTube (check before Google — YouTube is a Google subsidiary)
+            if (MatchesDomain(sni, "youtube.com") || MatchesDomain(sni, "ytimg.com") ||
+                MatchesDomain(sni, "youtu.be") || MatchesDomain(sni, "googlevideo.com") ||
+                MatchesDomain(sni, "yt3.ggpht.com"))
                 return AppType.YouTube;
-            // Contains() does a substring search.
-            if (lower.Contains("google") || lower.Contains("gstatic") || lower.Contains("googleapis"))
+
+            // Google
+            if (MatchesDomain(sni, "google.com") || MatchesDomain(sni, "gstatic.com") ||
+                MatchesDomain(sni, "googleapis.com") || MatchesDomain(sni, "google.co.in") ||
+                MatchesDomain(sni, "gvt1.com") || MatchesDomain(sni, "googlesyndication.com") ||
+                MatchesDomain(sni, "googleadservices.com") || MatchesDomain(sni, "googleusercontent.com") ||
+                MatchesDomain(sni, "doubleclick.net"))
                 return AppType.Google;
-            if (lower.Contains("instagram") || lower.Contains("cdninstagram"))
+
+            // Instagram (check before Facebook — owned by Meta)
+            if (MatchesDomain(sni, "instagram.com") || MatchesDomain(sni, "cdninstagram.com"))
                 return AppType.Instagram;
-            if (lower.Contains("whatsapp") || lower.Contains("wa.me"))
+
+            // WhatsApp (check before Facebook — owned by Meta)
+            if (MatchesDomain(sni, "whatsapp.net") || MatchesDomain(sni, "whatsapp.com") ||
+                MatchesDomain(sni, "wa.me"))
                 return AppType.WhatsApp;
-            if (lower.Contains("facebook") || lower.Contains("fbcdn") || lower.Contains("fb.com") || lower.Contains("meta.com"))
+
+            // Facebook / Meta
+            if (MatchesDomain(sni, "facebook.com") || MatchesDomain(sni, "fbcdn.net") ||
+                MatchesDomain(sni, "fb.com") || MatchesDomain(sni, "meta.com"))
                 return AppType.Facebook;
-            if (lower.Contains("twitter") || lower.Contains("twimg") || lower.Contains("x.com") || lower.Contains("t.co"))
+
+            // Twitter / X
+            if (MatchesDomain(sni, "twitter.com") || MatchesDomain(sni, "twimg.com") ||
+                MatchesDomain(sni, "x.com") || MatchesDomain(sni, "t.co"))
                 return AppType.Twitter;
-            if (lower.Contains("netflix") || lower.Contains("nflxvideo"))
+
+            // Netflix
+            if (MatchesDomain(sni, "netflix.com") || MatchesDomain(sni, "nflxvideo.net"))
                 return AppType.Netflix;
-            if (lower.Contains("amazon") || lower.Contains("amazonaws") || lower.Contains("cloudfront"))
+
+            // Amazon
+            if (MatchesDomain(sni, "amazon.com") || MatchesDomain(sni, "amazonaws.com") ||
+                MatchesDomain(sni, "cloudfront.net"))
                 return AppType.Amazon;
-            if (lower.Contains("microsoft") || lower.Contains("azure") || lower.Contains("office") || lower.Contains("live.com"))
+
+            // Microsoft
+            if (MatchesDomain(sni, "microsoft.com") || MatchesDomain(sni, "azure.com") ||
+                MatchesDomain(sni, "office.com") || MatchesDomain(sni, "live.com") ||
+                MatchesDomain(sni, "office365.com"))
                 return AppType.Microsoft;
-            if (lower.Contains("apple") || lower.Contains("icloud"))
+
+            // Apple
+            if (MatchesDomain(sni, "apple.com") || MatchesDomain(sni, "icloud.com"))
                 return AppType.Apple;
-            if (lower.Contains("tiktok") || lower.Contains("bytedance"))
+
+            // TikTok
+            if (MatchesDomain(sni, "tiktok.com") || MatchesDomain(sni, "bytedance.com") ||
+                MatchesDomain(sni, "tiktokcdn.com"))
                 return AppType.TikTok;
-            if (lower.Contains("spotify") || lower.Contains("scdn.co"))
+
+            // Spotify
+            if (MatchesDomain(sni, "spotify.com") || MatchesDomain(sni, "scdn.co"))
                 return AppType.Spotify;
-            if (lower.Contains("discord") || lower.Contains("discordapp"))
+
+            // Discord
+            if (MatchesDomain(sni, "discord.com") || MatchesDomain(sni, "discordapp.com") ||
+                MatchesDomain(sni, "discord.gg"))
                 return AppType.Discord;
-            if (lower.Contains("github") || lower.Contains("githubusercontent"))
+
+            // GitHub
+            if (MatchesDomain(sni, "github.com") || MatchesDomain(sni, "githubusercontent.com"))
                 return AppType.GitHub;
-            if (lower.Contains("telegram") || lower.Contains("t.me"))
+
+            // Telegram
+            if (MatchesDomain(sni, "telegram.org") || MatchesDomain(sni, "t.me"))
                 return AppType.Telegram;
-            if (lower.Contains("zoom"))
+
+            // Zoom
+            if (MatchesDomain(sni, "zoom.us") || MatchesDomain(sni, "zoom.com"))
                 return AppType.Zoom;
-            if (lower.Contains("cloudflare"))
+
+            // Cloudflare
+            if (MatchesDomain(sni, "cloudflare.com") || MatchesDomain(sni, "cloudflare.net"))
                 return AppType.Cloudflare;
 
             return AppType.Other;
