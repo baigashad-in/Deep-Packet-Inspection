@@ -9,12 +9,119 @@ namespace Deep_Packet_Analyzer.Types
     public static class AppClassifier
     // Maps domain names(from SNI or HTTP Host headers) to AppType enums.
     {
+
+        private static readonly Dictionary<AppType, string[]> AppDomains = new()
+        {
+            [AppType.YouTube] = new[]
+            {
+                "youtube.com", "ytimg.com", "youtu.be",
+                "googlevideo.com", "yt3.ggpht.com"
+            },
+            [AppType.Google] = new[]
+            {
+                "google.com", "gstatic.com", "googleapis.com",
+                "google.co.in", "gvt1.com", "googlesyndication.com",
+                "googleadservices.com", "googleusercontent.com",
+                "doubleclick.net"
+            },
+            [AppType.Instagram] = new[]
+            {
+                "instagram.com", "cdninstagram.com"
+            },
+            [AppType.WhatsApp] = new[]
+            {
+                "whatsapp.net", "whatsapp.com", "wa.me"
+            },
+            [AppType.Facebook] = new[]
+            {
+                "facebook.com", "fbcdn.net", "fb.com", "meta.com"
+            },
+            [AppType.Twitter] = new[]
+            {
+                "twitter.com", "twimg.com", "x.com", "t.co"
+            },
+            [AppType.Netflix] = new[]
+            {
+                "netflix.com", "nflxvideo.net"
+            },
+            [AppType.Amazon] = new[]
+            {
+                "amazon.com", "amazonaws.com", "cloudfront.net"
+            },
+            [AppType.Microsoft] = new[]
+            {
+                "microsoft.com", "azure.com", "office.com",
+                "live.com", "office365.com"
+            },
+            [AppType.Apple] = new[]
+            {
+                "apple.com", "icloud.com"
+            },
+            [AppType.TikTok] = new[]
+            {
+                "tiktok.com", "bytedance.com", "tiktokcdn.com"
+            },
+            [AppType.Spotify] = new[]
+            {
+                "spotify.com", "scdn.co"
+            },
+            [AppType.Discord] = new[]
+            {
+                "discord.com", "discordapp.com", "discord.gg"
+            },
+            [AppType.GitHub] = new[]
+            {
+                "github.com", "githubusercontent.com"
+            },
+            [AppType.Telegram] = new[]
+            {
+                "telegram.org", "t.me"
+            },
+            [AppType.Zoom] = new[]
+            {
+                "zoom.us", "zoom.com"
+            },
+            [AppType.Cloudflare] = new[]
+            {
+                "cloudflare.com", "cloudflare.net"
+            }
+        };
+
+
+        // Order matters: check specific apps before their parent companies
+        private static readonly AppType[] LookupOrder = new[]
+        {
+            AppType.YouTube,     // Before Google (YouTube is Google subsidiary)
+            AppType.Google,
+            AppType.Instagram,   // Before Facebook (Instagram is Meta subsidiary)
+            AppType.WhatsApp,    // Before Facebook (WhatsApp is Meta subsidiary)
+            AppType.Facebook,
+            AppType.Twitter,
+            AppType.Netflix,
+            AppType.Amazon,
+            AppType.Microsoft,
+            AppType.Apple,
+            AppType.TikTok,
+            AppType.Spotify,
+            AppType.Discord,
+            AppType.GitHub,
+            AppType.Telegram,
+            AppType.Zoom,
+            AppType.Cloudflare
+        };
+
+        private static bool MatchesDomain(string host, string domain)
+        {
+            return host.Equals(domain, StringComparison.OrdinalIgnoreCase) ||
+                   host.EndsWith("." + domain, StringComparison.OrdinalIgnoreCase);
+        }
+
         public static string AppTypeToString(AppType type)
-        // Convert enum to display name.
         {
             return type switch
             {
-                AppType.Unknown => "Other",
+                AppType.Unknown => "Unknown",
+                AppType.Other => "Other",
                 AppType.HTTP => "HTTP",
                 AppType.HTTPS => "HTTPS",
                 AppType.DNS => "DNS",
@@ -37,15 +144,8 @@ namespace Deep_Packet_Analyzer.Types
                 AppType.Discord => "Discord",
                 AppType.GitHub => "GitHub",
                 AppType.Cloudflare => "Cloudflare",
-                _ => "Unknown" // _ is the discard pattern — matches anything not listed above.
-
+                _ => "Unknown"
             };
-        }
-
-        private static bool MatchesDomain(string host, string domain)
-        {
-            return host.Equals(domain, StringComparison.OrdinalIgnoreCase) ||
-                   host.EndsWith("." + domain, StringComparison.OrdinalIgnoreCase);
         }
 
         public static AppType SniToAppType(string sni)
@@ -54,87 +154,14 @@ namespace Deep_Packet_Analyzer.Types
         {
             if (string.IsNullOrEmpty(sni)) return AppType.Unknown;
 
-            // YouTube (check before Google — YouTube is a Google subsidiary)
-            if (MatchesDomain(sni, "youtube.com") || MatchesDomain(sni, "ytimg.com") ||
-                MatchesDomain(sni, "youtu.be") || MatchesDomain(sni, "googlevideo.com") ||
-                MatchesDomain(sni, "yt3.ggpht.com"))
-                return AppType.YouTube;
-
-            // Google
-            if (MatchesDomain(sni, "google.com") || MatchesDomain(sni, "gstatic.com") ||
-                MatchesDomain(sni, "googleapis.com") || MatchesDomain(sni, "google.co.in") ||
-                MatchesDomain(sni, "gvt1.com") || MatchesDomain(sni, "googlesyndication.com") ||
-                MatchesDomain(sni, "googleadservices.com") || MatchesDomain(sni, "googleusercontent.com") ||
-                MatchesDomain(sni, "doubleclick.net"))
-                return AppType.Google;
-
-            // Instagram (check before Facebook — owned by Meta)
-            if (MatchesDomain(sni, "instagram.com") || MatchesDomain(sni, "cdninstagram.com"))
-                return AppType.Instagram;
-
-            // WhatsApp (check before Facebook — owned by Meta)
-            if (MatchesDomain(sni, "whatsapp.net") || MatchesDomain(sni, "whatsapp.com") ||
-                MatchesDomain(sni, "wa.me"))
-                return AppType.WhatsApp;
-
-            // Facebook / Meta
-            if (MatchesDomain(sni, "facebook.com") || MatchesDomain(sni, "fbcdn.net") ||
-                MatchesDomain(sni, "fb.com") || MatchesDomain(sni, "meta.com"))
-                return AppType.Facebook;
-
-            // Twitter / X
-            if (MatchesDomain(sni, "twitter.com") || MatchesDomain(sni, "twimg.com") ||
-                MatchesDomain(sni, "x.com") || MatchesDomain(sni, "t.co"))
-                return AppType.Twitter;
-
-            // Netflix
-            if (MatchesDomain(sni, "netflix.com") || MatchesDomain(sni, "nflxvideo.net"))
-                return AppType.Netflix;
-
-            // Amazon
-            if (MatchesDomain(sni, "amazon.com") || MatchesDomain(sni, "amazonaws.com") ||
-                MatchesDomain(sni, "cloudfront.net"))
-                return AppType.Amazon;
-
-            // Microsoft
-            if (MatchesDomain(sni, "microsoft.com") || MatchesDomain(sni, "azure.com") ||
-                MatchesDomain(sni, "office.com") || MatchesDomain(sni, "live.com") ||
-                MatchesDomain(sni, "office365.com"))
-                return AppType.Microsoft;
-
-            // Apple
-            if (MatchesDomain(sni, "apple.com") || MatchesDomain(sni, "icloud.com"))
-                return AppType.Apple;
-
-            // TikTok
-            if (MatchesDomain(sni, "tiktok.com") || MatchesDomain(sni, "bytedance.com") ||
-                MatchesDomain(sni, "tiktokcdn.com"))
-                return AppType.TikTok;
-
-            // Spotify
-            if (MatchesDomain(sni, "spotify.com") || MatchesDomain(sni, "scdn.co"))
-                return AppType.Spotify;
-
-            // Discord
-            if (MatchesDomain(sni, "discord.com") || MatchesDomain(sni, "discordapp.com") ||
-                MatchesDomain(sni, "discord.gg"))
-                return AppType.Discord;
-
-            // GitHub
-            if (MatchesDomain(sni, "github.com") || MatchesDomain(sni, "githubusercontent.com"))
-                return AppType.GitHub;
-
-            // Telegram
-            if (MatchesDomain(sni, "telegram.org") || MatchesDomain(sni, "t.me"))
-                return AppType.Telegram;
-
-            // Zoom
-            if (MatchesDomain(sni, "zoom.us") || MatchesDomain(sni, "zoom.com"))
-                return AppType.Zoom;
-
-            // Cloudflare
-            if (MatchesDomain(sni, "cloudflare.com") || MatchesDomain(sni, "cloudflare.net"))
-                return AppType.Cloudflare;
+            foreach (var appType in LookupOrder)
+            {
+                foreach (var domain in AppDomains[appType])
+                {
+                    if (MatchesDomain(sni, domain))
+                        return appType;
+                }
+            }
 
             return AppType.Other;
             // If SNI is present but doesn't match any known pattern,
