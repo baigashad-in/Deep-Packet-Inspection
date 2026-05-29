@@ -47,6 +47,8 @@ namespace Deep_Packet_Analyzer.Types
             };
         }
 
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, AppType> _sniCache = new();
+
         private static readonly (AppType App, string[] Domains)[] AppDomainMap =
         {
             // Check order matters: specific apps before their parent companies
@@ -113,7 +115,16 @@ namespace Deep_Packet_Analyzer.Types
         // Called every time we extract an SNI from a TLS Client Hello.
         {
             if (string.IsNullOrEmpty(sni)) return AppType.Unknown;
+            if (_sniCache.TryGetValue(sni, out var cached))
+                return cached;
 
+            AppType result = ClassifyDomain(sni);
+            _sniCache.TryAdd(sni, result);
+            return result;
+        }
+
+        private static AppType ClassifyDomain(string sni)
+        {
             foreach (var (app, domains) in AppDomainMap)
             {
                 foreach (var domain in domains)
