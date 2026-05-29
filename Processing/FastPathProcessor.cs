@@ -21,6 +21,9 @@ namespace Deep_Packet_Analyzer.Processing
         private long _packetsDropped;
         private long _sniExtractions;
 
+        private long _lastCleanupTicks = Environment.TickCount64;
+        private const long CLEANUP_INTERVAL_MS = 30000;
+
         private volatile bool _running;
         private Thread? _thread;
 
@@ -69,11 +72,14 @@ namespace Deep_Packet_Analyzer.Processing
 
                     if (job is null)
                 {
-                    _connTracker.CleanupStale(TimeSpan.FromMinutes(5));
+                    RunPeriodicCleanup();
                     continue;
                 }
 
                 Interlocked.Increment(ref _packetsProcessed);
+
+                if (Environment.TickCount64 - _lastCleanupTicks > CLEANUP_INTERVAL_MS)
+                    RunPeriodicCleanup();
 
                 try
                 {
@@ -210,6 +216,14 @@ namespace Deep_Packet_Analyzer.Processing
             if (flags.HasFlag(TcpFlags.RST)) conn.StateObj = ConnectionState.Closed;
             if (conn.FinSeen && flags.HasFlag(TcpFlags.ACK))
                 conn.StateObj = ConnectionState.Closed;
+        }
+
+        private void RunPeriodicCleanup()
+        {
+            _lastCleanupTicks = Environment.TickCount64;
+            int cleaned = _connTracker.CleanupStale(TimeSpan.FromMinutes(5));
+            if (cleaned > 0)
+                Console.WriteLine($"[FP{_fpId}] Cleaned {cleaned} stale connections");
         }
 
         public long PacketsProcessed => Interlocked.Read(ref _packetsProcessed);
